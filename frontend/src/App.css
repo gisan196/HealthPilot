@@ -1,0 +1,38 @@
+/* app.css */
+
+/* Header */
+.header {
+  height: 64px;
+  width: 100%;
+  background: #01280d;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 999;
+  color: white;
+}
+
+/* Layout */
+.page-layout {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* Content */
+.page-content {
+  flex: 1;
+  padding-top: 0px;
+  /* HEADER HEIGHT */
+  padding-bottom: 64px;
+  /* FOOTER HEIGHT */
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding-right: 0px;
+  padding-left: 0px;
+}

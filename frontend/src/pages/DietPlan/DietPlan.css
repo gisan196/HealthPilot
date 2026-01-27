@@ -1,0 +1,178 @@
+.diet-page {
+  min-height: calc(100vh - 64px - 64px); /* header + footer */
+  background: #e5efe9;
+  box-sizing: border-box;
+  padding: 0; /* remove padding */
+}
+
+.meal-plan-wrapper {
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
+  background: #e5efe9;
+  padding: 0; 
+  box-sizing: border-box;
+  
+}
+
+.meal-plan-inner {
+  padding: 80px 12px 10px;
+  box-sizing: border-box;
+  
+}
+
+.app-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 24px;
+  background: #e5efe9;
+  min-height: 100vh;
+}
+
+.empty-state {
+  width: 100%;
+  max-width: 560px;
+  text-align: center;
+}
+
+.simple-message {
+  font-size: 1.1rem;
+  color: #1f2937;
+  margin-bottom: 14px;
+  line-height: 1.5;
+
+  /* Prevent breaking words */
+  word-break: keep-all;
+  white-space: normal;
+}
+
+
+.generate-btn {
+  background: linear-gradient(135deg, #01280d, #295339);
+  color: white;
+  border: none;
+  padding: 12px 26px;
+  border-radius: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+
+
+
+.feedback-section {
+  margin-top: 22px;
+  text-align: left;
+}
+
+
+/* Text */
+.greeting {
+  font-size: 2rem;
+  color: #1e3a8a;
+  margin-bottom: 12px;
+}
+
+
+.no-plan-text {
+  font-size: 1.1rem;
+  color: #374151;
+  margin-bottom: 28px;
+  max-width: 600px;
+}
+
+
+.generate-btn:hover {
+  opacity: 0.95;
+}
+
+/* Delete */
+.delete-wrapper {
+  display: flex;
+  justify-content: center;
+  margin-top: 26px;
+}
+
+.delete-button {
+  background-color: #dc2626;
+  color: white;
+  border: none;
+  padding: 12px 26px;
+  border-radius: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.delete-button svg {
+  margin-right: 8px;
+  font-size: 18px;
+  vertical-align: middle;
+}
+.delete-button:hover {
+  background-color: #b91c1c;
+}
+
+/* ===== FEEDBACK ===== */
+.feedback-section {
+  margin-top: 48px;
+    width: 100%;
+  max-width: 1400px;      /*  ideal for dashboards */
+  margin: 0 auto;        /* center */
+  background: #e5efe9;
+  padding: 80px 32px 40px;
+  box-sizing: border-box;
+}
+
+.feedback-header-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.feedback-title {
+  font-size: 22px;
+  font-weight: 700;
+  color: #151515;
+}
+
+.feedback-arrow {
+  font-size: 26px;
+  transition: transform 0.3s ease;
+}
+
+.feedback-arrow.open {
+  transform: rotate(180deg);
+}
+
+.feedback-content {
+  overflow: hidden;
+  transition: max-height 0.4s ease, opacity 0.3s ease;
+}
+
+.feedback-content.hide {
+  max-height: 0;
+  opacity: 0;
+}
+
+.feedback-content.show {
+  max-height: 3000px;
+  opacity: 1;
+  margin-top: 24px;
+}
+
+/* Mobile */
+@media (max-width: 968px) {
+  .diet-page {
+    padding: 16px;
+  }
+
+  .greeting {
+    font-size: 1.6rem;
+  }
+
+  .no-plan-text {
+    font-size: 1rem;
+  }
+}

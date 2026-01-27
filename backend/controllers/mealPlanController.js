@@ -1,0 +1,499 @@
+import MealPlan from "../models/MealPlan.js";
+import Meal from "../models/Meal.js";
+import FoodItem from "../models/FoodItem.js";
+import UserProfile from "../models/UserProfile.js"; // Import your profile model
+import { calculateMacros } from "../utils/nutritionCalculator.js";
+import { generateMealPlan } from "../services/openRouterService.js";
+
+/**
+ * Convert YYYY-MM-DD or Date to UTC midnight
+ * Ensures the date is valid worldwide
+ */
+const toUTCDateOnly = (dateInput) => {
+  const d = new Date(dateInput);
+  return new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+};
+
+/**
+ * Clean AI JSON response
+ * - Remove ```json or ``` wrappers
+ * - Replace NaN with 0
+ */
+const cleanAIResponse = (str) => {
+  if (!str) return "{}";
+
+  // Remove ```json or ``` at start/end
+  str = str.trim()
+    .replace(/^```json\s*/, "")
+    .replace(/^```/, "")
+    .replace(/```$/, "");
+
+  // Replace NaN with 0
+  str = str.replace(/\bNaN\b/g, "0");
+
+  return str;
+};
+
+export const createMealPlan = async (req, res) => {
+
+  try {
+    const user_id = req.user.id;
+
+    if (!user_id) {
+      return res.status(401).json({ success: false, message: "user_id is required" });
+    }
+
+    // Fetch user profile
+    const userProfile = await UserProfile.findOne({ user_id, status: "active" });
+    if (!userProfile) {
+      return res.status(404).json({ success: false, message: "Active User profile not found" });
+    }
+
+    const profileData = {
+      user_id,
+      age: Number(userProfile.age),
+      gender: userProfile.gender,
+      weight: Number(userProfile.weight),
+      height: Number(userProfile.height),
+      activityLevel: userProfile.activityLevel,
+      fitnessGoal: userProfile.fitnessGoal,
+      dietaryRestrictions: userProfile.dietaryRestrictions || [],
+      workoutPreferences: userProfile.workoutPreferences || "",
+      culturalDietaryPatterns: userProfile.culturalDietaryPatterns || [],
+      days: userProfile.days,
+    };
+
+    console.log("Calculating macros for user profile:", profileData);
+    const macros = calculateMacros(profileData);
+    const dietaryText = profileData.dietaryRestrictions.length > 0
+      ? profileData.dietaryRestrictions.join(", ")
+      : "None";
+
+    const culturalText = profileData.culturalDietaryPatterns.length > 0
+      ? profileData.culturalDietaryPatterns.join(", ")
+      : "None";
+    // ====== DAYS LOGIC ======
+    const requestedDays = Number(profileData.days || 0);
+
+    let daysPrompt;
+    if (requestedDays === 0) {
+      daysPrompt = `Duration: AI should decide best duration based on user profile.`;
+    } else {
+      daysPrompt = `Duration: Create a meal plan for ${requestedDays} days.
+If ${requestedDays} is less than 7, AI should decide a suitable duration (>=7).`;
+    }
+    // AI Prompt
+    const prompt = `
+You are a certified nutritionist.
+
+Create a MEAL PLAN TEMPLATE based strictly on the following user profile.
+
+USER PROFILE:
+- Age: ${profileData.age}
+- Gender: ${profileData.gender}
+- Weight: ${profileData.weight} kg
+- Height: ${profileData.height} cm
+- Fitness Goal: ${profileData.fitnessGoal}
+- Dietary Restrictions: ${dietaryText}
+- Meals should come from this culture or countries: ${culturalText}
+
+PLAN PURPOSE:
+- This is a TEMPLATE, not a fixed plan
+- For EACH meal, provide MULTIPLE food OPTIONS
+- The user will select ONLY ONE food option per meal per day
+
+MEAL STRUCTURE (STRICT — DO NOT CHANGE):
+- Breakfast → EXACTLY 3 food options
+- Lunch → EXACTLY 3 food options
+- Dinner → EXACTLY 3 food options
+- Snack → EXACTLY 2 food options
+
+IMPORTANT MEAL RULES:
+1. Each food item represents ONE COMPLETE MEAL OPTION
+   (do NOT split meals into components or combinations)
+2. All food options within the SAME meal type must be
+   nutritionally similar (within ±10% calories and macros)
+3. Meals must respect dietary restrictions and food culture
+4. Meals should be realistic, safe, and commonly eaten foods
+
+REQUIRED FIELDS FOR EVERY FOOD ITEM:
+- name (string)
+- calories (number)
+- protein (number)
+- fat (number)
+- carbohydrates (number)
+- unit (string, e.g., "1 cup", "1 serving", "2 slices")
+
+DURATION in days: ${daysPrompt}
+
+DAILY NUTRITION TARGETS
+(User chooses meal options to approximately meet these):
+- Calories: ${macros.calories}
+- Protein: ${macros.protein} g
+- Carbohydrates: ${macros.carbs} g
+- Fat: ${macros.fat} g
+
+OUTPUT RULES:
+- Return ONLY valid JSON
+- No explanations or extra text
+- Numbers must be plain digits ONLY (no units in numbers)
+- Do NOT include comments or trailing commas
+
+OUTPUT FORMAT (STRICT):
+{
+  "meals": [
+    {
+      "mealType": "Breakfast",
+      "foods": [
+        {
+          "name": "string",
+          "calories": number,
+          "protein": number,
+          "fat": number,
+          "carbohydrates": number,
+          "unit": "string"
+        }
+      ]
+    }
+  ],
+  "durationDays": number
+}
+`;
+
+
+
+    const aiResponseRaw = await generateMealPlan(prompt);
+
+    let mealPlanData;
+    try {
+      mealPlanData = JSON.parse(aiResponseRaw);
+      console.log(mealPlanData);
+    } catch (err) {
+      console.error("AI returned invalid JSON:", aiResponseRaw);
+      return res.status(500).json({
+        success: false,
+        message: "AI returned invalid JSON"
+      });
+    }
+
+
+
+
+    const aiDuration = mealPlanData.durationDays && !isNaN(mealPlanData.durationDays)
+      ? Number(mealPlanData.durationDays)
+      : 7; // fallback
+
+    let durationDays;
+    //If user selected 0 → AI decides
+    //If user selected less than 7 → AI decides
+    //If user selected 7 or more → use user value
+    if (requestedDays === 0) {
+      durationDays = aiDuration;
+    } else {
+      durationDays = requestedDays < 7 ? aiDuration : requestedDays;
+    }
+
+    await UserProfile.findOneAndUpdate(
+      { user_id },
+      { days: durationDays },
+      { new: true }
+    );
+    // Ensure totalCalories is a number
+    if (!mealPlanData.totalCalories || isNaN(mealPlanData.totalCalories)) {
+      mealPlanData.totalCalories = macros.calories;
+    }
+
+    const startDateUTC = new Date();
+    startDateUTC.setUTCHours(0, 0, 0, 0);   // set time to 00:00:00 UTC
+
+    const endDateUTC = new Date(startDateUTC);
+    endDateUTC.setDate(endDateUTC.getDate() + durationDays - 1);
+
+
+    const newMealPlan = await MealPlan.create({
+      user_id,
+      userProfile_id: userProfile._id,
+      startDate: startDateUTC,
+      endDate: endDateUTC,
+      totalCalories: mealPlanData.totalCalories,
+      totalProtein: macros.protein,
+      totalCarbs: macros.carbs,
+      totalFat: macros.fat,
+      status: "active",
+    });
+
+
+    // Save Meals and FoodItems
+    for (const meal of mealPlanData.meals || []) {
+      const newMeal = await Meal.create({
+        mealplan_id: newMealPlan._id,
+        mealType: meal.mealType,
+      });
+
+      for (const food of meal.foods || []) {
+        await FoodItem.create({
+          meal_id: newMeal._id,
+          name: food.name || "Unknown Food",
+          calories: food.calories || 0,
+          protein: food.protein || 0,
+          fat: food.fat || 0,
+          carbohydrates: food.carbohydrates || 0,
+          unit: food.unit || "serving",
+        });
+      }
+    }
+    // AFTER SUCCESS -> mark old plan as updated
+    await MealPlan.updateMany(
+      { user_id, status: "active", _id: { $ne: newMealPlan._id } },
+      { status: "account-updated" }
+    );
+    res.json({
+      success: true,
+      message: "Meal plan generated and saved successfully",
+      macros,
+      mealPlan: mealPlanData,
+    });
+  } catch (err) {
+    console.error("Meal Plan Error:", err);
+    res.status(500).json({
+      success: false,
+      message: "Meal plan generation failed",
+      error: err.message,
+    });
+  }
+};
+
+// Update MealPlan Status
+
+export const updateMealPlanStatus = async (req, res) => {
+  try {
+    const { mealPlanId } = req.params;
+    const { status } = req.body;
+
+    if (!["completed", "account-updated", "not-suitable"].includes(status)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid status. Allowed: completed, account-updated, not-suitable",
+      });
+    }
+
+    const mealPlan = await MealPlan.findById(mealPlanId);
+    if (!mealPlan) {
+      return res.status(404).json({ success: false, message: "Meal plan not found" });
+    }
+
+    mealPlan.status = status;
+    await mealPlan.save();
+
+    res.json({
+      success: true,
+      message: `Meal plan status updated to ${status}`,
+      mealPlan: {
+        id: mealPlan._id,
+        status: mealPlan.status,
+      },
+    });
+  } catch (err) {
+    console.error("Update MealPlan Status Error:", err);
+    res.status(500).json({
+      success: false,
+      message: "Failed to update meal plan status",
+      error: err.message,
+    });
+  }
+};
+
+// Delete all MealPlans for user & profile
+
+export const deleteMealPlansByUserProfile = async (req, res) => {
+  try {
+    const { userProfile_id } = req.query;
+    const user_id = req.user.id; // from authMiddleware
+    if (!user_id || !userProfile_id) {
+      return res.status(400).json({
+        success: false,
+        message: "user_id and userProfile_id are required",
+      });
+    }
+
+    const result = await MealPlan.deleteMany({
+      user_id,
+      userProfile_id,
+    });
+
+    res.json({
+      success: true,
+      message: `Deleted ${result.deletedCount} meal plan(s) for this user & profile`,
+    });
+  } catch (err) {
+    console.error("Delete MealPlans Error:", err);
+    res.status(500).json({
+      success: false,
+      message: "Failed to delete meal plans",
+      error: err.message,
+    });
+  }
+};
+
+
+/* ---------------------------
+   GET LATEST ACTIVE MEAL PLAN
+---------------------------- */
+export const getLatestMealPlan = async (req, res) => {
+  try {
+    const user_id = req.user.id; // from authMiddleware
+    if (!user_id)
+      return res.status(400).json({ message: "user_id is required" });
+
+    // Fetch latest active meal plan
+    const mealPlan = await MealPlan.findOne({
+      user_id,
+      status: "active",
+    }).sort({ createdAt: -1 });
+
+    if (!mealPlan)
+      return res.json({ success: false, message: "No active meal plan found" });
+
+    // Fetch meals and their food items
+    const meals = await Meal.find({ mealplan_id: mealPlan._id });
+    const mealWithItems = [];
+    for (const m of meals) {
+      const foods = await FoodItem.find({ meal_id: m._id });
+      mealWithItems.push({ ...m.toObject(), foods });
+    }
+
+    res.json({ success: true, mealPlan: { ...mealPlan.toObject(), meals: mealWithItems } });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Failed to fetch meal plan", error: err.message });
+  }
+};
+
+/* 
+   GET ALL NOT-SUITABLE MEAL PLANS
+ */
+export const getNotSuitableMealPlans = async (req, res) => {
+  try {
+    const user_id = req.user.id; // from authMiddleware
+    if (!user_id)
+      return res.status(400).json({ message: "user_id is required" });
+
+    const mealPlans = await MealPlan.find({
+      user_id,
+      status: "not-suitable",
+    }).sort({ createdAt: -1 });
+
+    const results = [];
+    for (const plan of mealPlans) {
+      const meals = await Meal.find({ mealplan_id: plan._id });
+      const mealWithItems = [];
+      for (const m of meals) {
+        const foods = await FoodItem.find({ meal_id: m._id });
+        mealWithItems.push({ ...m.toObject(), foods });
+      }
+      results.push({ ...plan.toObject(), meals: mealWithItems });
+    }
+
+    res.json({ success: true, mealPlans: results });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Failed to fetch not-suitable meal plans", error: err.message });
+  }
+};
+
+/* ---------------------------
+   GET ALL COMPLETED MEAL PLANS
+---------------------------- */
+export const getCompletedMealPlans = async (req, res) => {
+  try {
+    const user_id = req.user.id; // from authMiddleware
+    if (!user_id)
+      return res.status(400).json({ message: "user_id is required" });
+
+    const mealPlans = await MealPlan.find({
+      user_id,
+      status: "completed",
+    }).sort({ createdAt: -1 });
+
+    const results = [];
+    for (const plan of mealPlans) {
+      const meals = await Meal.find({ mealplan_id: plan._id });
+      const mealWithItems = [];
+      for (const m of meals) {
+        const foods = await FoodItem.find({ meal_id: m._id });
+        mealWithItems.push({ ...m.toObject(), foods });
+      }
+      results.push({ ...plan.toObject(), meals: mealWithItems });
+    }
+
+    res.json({ success: true, mealPlans: results });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Failed to fetch completed meal plans", error: err.message });
+  }
+};
+
+
+
+export const updateMealPlanStartDate = async (req, res) => {
+  try {
+    const { mealPlanId } = req.params;
+    const { startDate } = req.body;
+
+    if (!startDate) {
+      return res.status(400).json({
+        success: false,
+        message: "startDate is required",
+      });
+    }
+
+    const mealPlan = await MealPlan.findById(mealPlanId);
+
+    if (!mealPlan) {
+      return res.status(404).json({
+        success: false,
+        message: "Meal plan not found",
+      });
+    }
+
+    // ---- CALCULATE GAP ----
+    const oldStart = new Date(mealPlan.startDate);
+    const oldEnd = new Date(mealPlan.endDate);
+
+    const durationMs = oldEnd.getTime() - oldStart.getTime();
+    if (durationMs <= 0) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid existing plan duration",
+      });
+    }
+
+    // ---- SET NEW DATES ----
+    const newStart = new Date(startDate);
+    newStart.setHours(0, 0, 0, 0);
+
+    const newEnd = new Date(newStart.getTime() + durationMs);
+
+    mealPlan.startDate = newStart;
+    mealPlan.endDate = newEnd;
+
+    await mealPlan.save();
+
+    res.json({
+      success: true,
+      message: "Meal plan dates updated successfully",
+      mealPlan: {
+        id: mealPlan._id,
+        startDate: mealPlan.startDate,
+        endDate: mealPlan.endDate,
+      },
+    });
+  } catch (err) {
+    console.error("Update MealPlan Date Error:", err);
+    res.status(500).json({
+      success: false,
+      message: "Failed to update meal plan dates",
+      error: err.message,
+    });
+  }
+};

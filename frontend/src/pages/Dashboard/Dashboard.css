@@ -1,0 +1,146 @@
+.dashboard-root {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  min-height: calc(100vh - 64px - 64px);
+  background: #e5efe9;
+}
+.dashboard-main {
+  width: 100%;
+  padding: 80px 12px 10px;
+  box-sizing: border-box;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: 220px 1fr 1fr;
+  gap: 16px;
+  column-gap: 44px;
+  grid-template-areas:
+    "progress stats calendar"
+    "progress adherence calories";
+  grid-auto-rows: auto;
+}
+
+
+.dashboard-grid > div {
+  height: 100%;
+}
+
+.progress-col,
+.stats-col,
+.calendar-col,
+.adherence-col,
+.calories-col {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.progress-col > * ,
+.stats-col > * ,
+.calendar-col > * ,
+.adherence-col > * ,
+.calories-col > * {
+  flex: 1;
+}
+
+.dashboard-grid > div {
+  height: 100%;
+}
+
+
+.stats-col,
+.calendar-col,
+.adherence-col,
+.calories-col {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.stats-col > * ,
+.calendar-col > * ,
+.adherence-col > * ,
+.calories-col > * {
+  flex: 1;
+}
+
+.progress-col {
+  grid-row: span 2;
+  min-height: 0;
+}
+
+.progress-col > * {
+  flex: 1;
+  min-height: 0;
+}
+
+
+
+
+/* GRID AREAS */
+.progress-col {
+  grid-area: progress;
+}
+
+.stats-col {
+  grid-area: stats;
+}
+
+.calendar-col {
+  grid-area: calendar;
+}
+
+.adherence-col {
+  grid-area: adherence;
+}
+
+.calories-col {
+  grid-area: calories;
+}
+
+/* ACTIVITIES */
+.activities {
+  margin-top: 28px;
+  display: grid;
+  gap: 22px;
+}
+
+.dashboard-grid {
+  grid-auto-rows: auto;
+}
+
+@media (min-width: 1025px) {
+  .dashboard-grid {
+    grid-auto-rows: 1fr;
+  }
+}
+
+@media (max-width: 1024px) {
+  .dashboard-grid {
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-areas:
+      "progress stats"
+      "calendar calendar"
+      "adherence calories";
+    grid-auto-rows: auto;
+  }
+}
+
+@media (max-width: 600px) {
+  .dashboard-grid {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "progress"
+      "stats"
+      "calendar"
+      "adherence"
+      "calories";
+    grid-auto-rows: auto;
+  }
+}
+

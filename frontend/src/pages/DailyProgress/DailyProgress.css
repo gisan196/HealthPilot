@@ -1,0 +1,420 @@
+/* ===== Container & Layout ===== */
+.progress-page {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  min-height: calc(100vh - 64px - 64px);
+  background: #e5efe9;
+}
+.done {
+  text-align: center;
+  font-size: 18px;
+  color: #2b7a4b;
+  font-weight: 600;
+  margin: 20px 0;
+  padding: 10px 15px;
+  width: fit-content;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.progress-inner {
+  width: 100%;
+  padding: 80px 12px 10px;
+  box-sizing: border-box;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+.icon-green {
+  color: #2b7a4b;
+  font-size: 16px;
+}
+.invalid-date-msg {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+
+  margin: 20px auto;
+  padding: 12px 18px;
+  width: fit-content;
+
+  background: #fff6f3;
+  border: 1px solid #f5c2c2;
+  color: #b45309;
+  border-radius: 14px;
+  font-weight: 600;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+}
+
+/* ===== Date Picker ===== */
+.date-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  margin: 16px 0;
+}
+
+.date-container p {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: #2f3a4a;
+}
+
+.date-picker {
+  width: 240px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid #cbd5e1;
+  font-size: 14px;
+  background: #fff;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.06);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.date-picker:hover {
+  border-color: #a3bffa;
+}
+
+.date-picker:focus {
+  outline: none;
+  border-color: #4f8bff;
+  box-shadow: 0 0 0 4px rgba(79, 139, 255, 0.2);
+}
+
+.date-picker:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+
+.text-red {
+  color: red;
+}
+
+/* ===== Macro Summary (Right side display) ===== */
+.macro-summary {
+  background: linear-gradient(90deg, #a3ffb8, #ecf0ed);
+  padding: 12px 14px;
+  border-radius: 12px;
+  margin-bottom: 20px;
+  display: flex;
+  justify-content: space-between;
+  gap: 18px;
+  align-items: center;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.08);
+}
+
+.food-right {
+  display: flex;
+  gap: 18px;
+  align-items: center;
+  
+}
+
+.food-metric {
+  text-align: center;
+}
+
+.food-metric .value {
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.food-metric .label {
+  font-size: 12px;
+  color: #6b7280;
+}
+
+/* Colors */
+.food-metric.kcal .value { color: #1d9bf0; }
+.food-metric.carbs .value { color: #ec4899; }
+.food-metric.protein .value { color: #22c55e; }
+.food-metric.fat .value { color: #f97316; }
+
+/* ===== Body Metrics ===== */
+.body-section {
+  margin-bottom: 25px;
+}
+
+.body-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 14px;
+}
+
+.body-field input {
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: 1px solid #cbd5e1;
+  font-size: 14px;
+}
+
+/* ===== Cards ===== */
+.meal-card{
+  padding: 12px 14px;
+  border-radius: 12px;
+  margin-bottom: 12px;
+  width: 100%;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.08);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.workout-card {
+  padding: 10px 14px; 
+  border-radius: 12px;
+  margin-bottom: 12px;
+  width: 100%;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.08);
+  transition: transform 0.2s, box-shadow 0.2s;
+  background: linear-gradient(135deg, #dbeafe, #60a5fa);
+  min-height: 0;
+}
+
+
+
+.meal-card:hover, .workout-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0,0,0,0.12);
+}
+
+.meal-card.breakfast {
+  background: linear-gradient(135deg, #fff4d2, #ffe8a3);
+}
+
+.meal-card.lunch {
+  background: linear-gradient(135deg, #e6f6ff, #cceaff);
+}
+
+.meal-card.snack {
+  background: linear-gradient(135deg, #f3e8ff, #e0cfff);
+}
+
+.meal-card.dinner {
+  background: linear-gradient(135deg, #e8f8ef, #c8eed9);
+}
+
+.workout-card {
+  background: linear-gradient(135deg, #dbeafe, #60a5fa);
+}
+
+/* ===== Meal & Workout Items (Reduced Size) ===== */
+.meal-item{
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 8px;
+}
+.workout-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: nowrap;    
+  margin-bottom: 0;       
+}
+
+.workout-item input[type="text"] {
+  width: 90px;
+}
+
+.meal-item input[type="text"],
+.meal-item input[type="number"],
+.workout-item input[type="text"],
+.workout-item input[type="number"] {
+  padding: 6px 8px;
+  border-radius: 8px;
+  border: 1px solid #cbd5e1;
+  width: 100px;
+  font-size: 13px;
+}
+
+/* ===== Submit Button ===== */
+.submit-day {
+  display: block;
+  margin: 20px auto;
+  padding: 12px 24px;
+  background: linear-gradient(135deg, #01280d, #295339);
+  color: #fff;
+  border-radius: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+/* ===== Modal Overlay ===== */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  z-index: 999;
+}
+
+/* ===== Card Style ===== */
+.startdate-card {
+  width: 100%;
+  max-width: 520px;
+  background: #ffffff;
+  border-radius: 18px;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.25);
+  padding: 22px;
+  position: relative;
+  background: #e5efe9;
+  
+  
+}
+
+.startdate-header h2 {
+  margin: 0;
+  font-size: 22px;
+  color: #1f3a2d;
+}
+
+.startdate-header p {
+  margin: 6px 0 14px;
+  color: #55606a;
+  font-size: 14px;
+  
+}
+.startdate-header {
+  text-align: center; /* CENTER HEADER */
+}
+
+.startdate-header h2 {
+  margin: 0;
+}
+
+/* ===== Section Style ===== */
+.startdate-section {
+  margin: 16px 0;
+  padding: 14px;
+  border-radius: 14px;
+   background: linear-gradient(90deg, #a3ffb8, #6be29a);
+  border: 1px solid #d7e8d6;
+}
+
+.startdate-section h3 {
+  margin: 0 0 8px;
+  font-size: 16px;
+  color: #1f3a2d;
+}
+
+.startdate-section input[type="date"] {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box; /* FIX INPUT OUTSIDE CARD */
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid #cbd5e1;
+  font-size: 14px;
+}
+
+.end-date {
+  margin-top: 10px;
+  font-size: 14px;
+  color: #3b4a57;
+  text-align: center; /* CENTER */
+}
+
+/* ===== Buttons ===== */
+.modal-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.btn-confirm,
+.btn-cancel {
+  padding: 10px 14px;
+  border-radius: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  border: none;
+}
+
+.btn-confirm {
+  background: linear-gradient(135deg, #2b7a4b, #1f5f3a);
+  color: white;
+}
+
+.btn-cancel {
+  background: #f8efef;
+  color: #19191a;
+  
+}
+.btn-confirm:hover {
+   transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0,0,0,0.12); 
+
+}
+.btn-cancel:hover {
+   transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0,0,0,0.12); 
+
+}
+/* ===== Mobile ===== */
+@media (max-width: 991px) {
+  .body-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .macro-summary {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+/* ===== MOBILE LABEL / INPUT GAP FIX ===== */
+@media (max-width: 600px) {
+
+  /* Body metrics */
+  .body-field {
+    display: flex;
+    flex-direction: column;
+    gap: 4px; /* 👈 consistent label → input spacing */
+  }
+
+  .workout-card {
+    min-height: auto;   /* ✅ allow natural height */
+  }
+
+  .workout-item {
+    flex-wrap: wrap;    /* ✅ allow rows to break */
+  }
+
+ 
+  .body-field label {
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 0;
+  }
+
+  /* Meal & workout inputs */
+  .meal-item,
+  .workout-item {
+    gap: 6px;
+  }
+
+  .meal-item span,
+  .workout-item span {
+    margin-top: -2px;
+    font-size: 12px;
+    color: #374151;
+  }
+
+  /* Inputs tighter */
+  .meal-item input,
+  .workout-item input {
+    margin: 0;
+  }
+
+  /* Section headings spacing */
+  .section h3 {
+    margin-bottom: 10px;
+  }
+}

@@ -1,0 +1,34 @@
+import MealSection from "./MealSection";
+import "react-datepicker/dist/react-datepicker.css";
+import "./MealPlanCard.css";
+import PageHeader from "./PageHeader.jsx";
+import { FaAppleAlt } from "react-icons/fa";
+
+export default function MealPlanCard({ plan, index, showHeader = true }) {
+  return (
+    <div className="mealplan-card">
+      <div className="mealplan-header">
+        {showHeader && (
+          <PageHeader
+            icon={<FaAppleAlt />}
+            title="Your Diet Plan"
+            subtitle="Personalized nutrition designed to support your goals"
+          />
+        )}
+
+        <div className="macros">
+          <span>{plan.totalCalories || 0} kcal</span>
+          <span>{plan.totalProtein || 0}g protein</span>
+          <span>{plan.totalFat || 0}g fat</span>
+          <span>{plan.totalCarbs || 0}g carbs</span>
+        </div>
+      </div>
+
+      <div className="meals-grid">
+        {plan.meals.map((meal) => (
+          <MealSection key={meal.mealType} meal={meal} />
+        ))}
+      </div>
+    </div>
+  );
+}

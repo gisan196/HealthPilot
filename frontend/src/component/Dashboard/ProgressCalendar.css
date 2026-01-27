@@ -1,0 +1,201 @@
+.calendar-wrapper {
+  background: linear-gradient(90deg, #a3ffb8, #6be29a);
+  border-radius: 16px;
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.08);
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  margin: 0 auto;
+  padding: 0; /* IMPORTANT */
+}
+
+
+.calendar-inner {
+  padding: 18px; /* padding applied here */
+}
+
+.calendar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.month-title {
+  font-weight: 700;
+  font-size: 14px;
+ 
+}
+
+.nav-btn {
+  border: none;
+  background: #f3f4f6;
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 6px;
+}
+
+.calendar-header-day {
+  font-size: 10px;
+  text-align: center;
+  color: #64748b;
+  font-weight: 600;
+}
+
+.calendar-cell {
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  background: #e5e7eb;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.calendar-cell.empty {
+  background: transparent;
+}
+
+/* Start / End circle */
+.calendar-cell.both-start {
+   border: 3px solid #3b82f6; /* blue circle */
+  border-radius: 50%;
+  background: #eef2ff;
+}
+
+.calendar-cell.both-end {
+  border: 3px solid #ef4444; /* red circle */
+  border-radius: 50%;
+  background: #ffe4e6;
+}
+.calendar-cell.meal-start {
+  border: 3px solid #3b82f6; /* blue circle */
+  border-radius: 50%;
+  background: #eef2ff;
+}
+
+.calendar-cell.meal-end {
+  border: 3px solid #ef4444; /* red circle */
+  border-radius: 50%;
+  background: #ffe4e6;
+}
+
+.calendar-cell.workout-start {
+ border: 3px solid #3b82f6; /* blue circle */
+  border-radius: 50%;
+  background: #eef2ff;
+}
+
+.calendar-cell.workout-end {
+ border: 3px solid #ef4444; /* red circle */
+  border-radius: 50%;
+  background: #ffe4e6;
+}
+
+
+/* Today highlight */
+.calendar-cell.today {
+  background: #6fa9f0;
+  color: #ececed;
+}
+
+/* Past days missed */
+.calendar-cell.past {
+  background: #f9ee5d; /* soft yellow */
+  color: #0e0d0d;
+  
+}
+
+/* Tick mark */
+.tick {
+  position: absolute;
+  top: -3px;
+  right: -3px;
+  font-size: 10px;
+}
+
+.tick.meal {
+  color: #facc15; /* yellow */
+}
+
+.tick.workout {
+  color: #3b82f6; /* blue */
+}
+
+.tick.both {
+  color: #16a34a; /* green */
+}
+
+/* Tooltip */
+.calendar-cell:hover::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  top: -34px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 6px 10px;
+  border-radius: 8px;
+  background: rgba(10, 10, 10, 0.85);
+  color: #fff;
+  font-size: 11px;
+  white-space: nowrap;
+  z-index: 10;
+  pointer-events: none;
+  opacity: 0;
+  animation: pop 0.15s forwards;
+}
+
+/* Tooltip arrow */
+.calendar-cell:hover::before {
+  content: "";
+  position: absolute;
+  top: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-left: 6px solid transparent;
+  border-right: 6px solid transparent;
+  border-top: 6px solid rgba(10, 10, 10, 0.85);
+  z-index: 10;
+  opacity: 0;
+  animation: pop 0.15s forwards;
+}
+
+@keyframes pop {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
+/* Mobile */
+@media (max-width: 600px) {
+  .calendar-cell {
+    width: 24px;
+    height: 24px;
+    font-size: 10px;
+  }
+  .tick {
+    font-size: 8px;
+  }
+}
+
+/* Mobile: 1 month per row */
+@media (max-width: 600px) {
+  .progress-calendar-wrapper { grid-template-columns: 1fr !important; }
+  .calendar-month { min-width: 100%; }
+  .calendar-cell { width: 24px; height: 24px; font-size: 10px; }
+  .tick { font-size: 8px; }
+}
+

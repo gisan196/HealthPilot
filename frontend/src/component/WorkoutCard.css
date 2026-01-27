@@ -1,0 +1,84 @@
+.workout-card {
+  background: linear-gradient(90deg, #a3ffb8, #6be29a);
+  border-radius: 14px;
+  padding: 14px;
+  color: #000;
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.10);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  box-sizing: border-box;
+  min-height: 160px;
+  overflow: hidden;
+}
+div.workout-card {
+  background: linear-gradient(90deg, #a3ffb8, #6be29a);
+}
+
+
+.workout-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.18);
+}
+
+.workout-card h3 {
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 10px;
+  color: #032a47;
+}
+
+.workout-info {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px 10px;
+  font-size: 14px;
+  color: #1f2f3a;
+}
+
+.workout-info span {
+ 
+  padding: 6px 8px;
+  border-radius: 10px;
+   background-color: #fbf7f7;
+}
+
+
+.workout-metric.kcal {
+  color: #1d9bf0;
+
+}
+
+.workout-metric.sets {
+  color: #ec4899;
+
+}
+
+.workout-metric.reps {
+  color: #22c55e;
+
+}
+
+.workout-metric.rest {
+  color: #f97316;
+
+}
+
+.workout-metric.duration {
+  color: #8b5cf6;
+   
+}
+
+.workout-metric.target {
+  color: #0ea5e9;
+ 
+}
+
+/* MOBILE */
+@media (max-width: 768px) {
+  .workout-card {
+    min-height: auto;
+  }
+
+  .workout-info {
+    grid-template-columns: 1fr;
+  }
+}
