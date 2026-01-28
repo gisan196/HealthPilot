@@ -178,7 +178,7 @@ export default function Workout() {
           </p>
   
           <button className="generate-btn" onClick={handleGenerateWorkoutPlan}>
-            Generate Meal Plan
+            Generate Workout Plan
           </button>
   
           {/* Meal Feedback Section */}
