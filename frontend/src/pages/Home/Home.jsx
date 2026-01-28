@@ -4,9 +4,9 @@ import ProfileCard from "../../component/ProfileCard.jsx";
 import { useAuth } from "../../context/authContext.jsx";
 import { getProfileByUserId } from "../../api/userProfileApi.js";
 import "./Home.css";
-import workoutImage from "../../images/workout-image.jpg";
-import mealPlanImage from "../../images/meal-plan.jpg";
-import progressImage from "../../images/progress.jpg";
+//import workoutImage from "../../images/workout-image.jpg";
+//import mealPlanImage from "../../images/meal-plan.jpg";
+//import progressImage from "../../images/progress.jpg";
 import PageHeader from "../../component/PageHeader.jsx";
 import { FaHome } from "react-icons/fa";
 import { FaEdit, FaUserPlus } from "react-icons/fa";
@@ -22,6 +22,31 @@ const Home = () => {
   const [loading, setLoading] = useState(true);
   const [showProfileCard, setShowProfileCard] = useState(false);
   const token = localStorage.getItem("token");
+  const featureImages = [
+    {
+      title: "🥗 Personalized Diet Plans",
+      description:
+        "AI-generated meal plans based on your goals and preferences",
+      url: "https://res.cloudinary.com/dswdcfif6/image/upload/v1769590168/meal-plan_nxbnzu.jpg",
+      link: "/dietplan",
+      type: "diet-card",
+    },
+    {
+      title: "💪 Custom Workouts",
+      description:
+        "Tailored exercise routines for your fitness level and equipment",
+      url: "https://res.cloudinary.com/dswdcfif6/image/upload/v1769590993/workout-image_2_v1xf5i.jpg",
+      link: "/workouts",
+      type: "workout-cards",
+    },
+    {
+      title: "📊 Progress Tracking",
+      description: "Monitor your journey with detailed analytics and insights",
+      url: "https://res.cloudinary.com/dswdcfif6/image/upload/v1769590168/progress_j2hgpd.jpg",
+      link: "/dailyprogress",
+      type: "progress-cards",
+    },
+  ];
 
   useEffect(() => {
     if (location.state?.alert) {
@@ -54,7 +79,9 @@ const Home = () => {
 
     fetchProfile();
   }, [user?.id, profileUpdated, token]);
-  if (loading) {return <Loading text="Loading Home Page..." />};
+  if (loading) {
+    return <Loading text="Loading Home Page..." />;
+  }
   return (
     <main className="home">
       {alert && (
@@ -98,50 +125,23 @@ const Home = () => {
       </section>
 
       {/* Features */}
+
       <section className="features">
-        <div
-          className="feature-card diet-card"
-          onClick={() => navigate("/dietplan")}
-        >
-          <div className="feature-text">
-            <h3>🥗 Personalized Diet Plans</h3>
-            <p>AI-generated meal plans based on your goals and preferences</p>
+        {featureImages.map((feature, index) => (
+          <div
+            key={index}
+            className={`feature-card ${feature.type}`}
+            onClick={() => navigate(feature.link)}
+          >
+            <div className="feature-text">
+              <h3>{feature.title}</h3>
+              <p>{feature.description}</p>
+            </div>
+            <div className="feature-image-wrap">
+              <img src={feature.url} alt={feature.title} loading="lazy" />
+            </div>
           </div>
-
-          <div className="feature-image-wrap">
-            <img src={mealPlanImage} alt="Diet Plan" loading="lazy" />
-
-          </div>
-        </div>
-
-        <div className="feature-card workout-cards">
-          <div className="feature-text">
-            <h3>💪 Custom Workouts</h3>
-            <p>
-              Tailored exercise routines for your fitness level and equipment
-            </p>
-          </div>
-
-          <div className="feature-image-wrap">
-           <img src={workoutImage} alt="Workout Plan" loading="lazy" />
-          </div>
-        </div>
-
-        <div
-          className="feature-card progress-cards"
-          onClick={() => navigate("/dailyprogress")}
-        >
-          <div className="feature-text">
-            <h3>📊 Progress Tracking</h3>
-            <p>
-              Monitor your journey with detailed <br /> analytics and insights
-            </p>
-          </div>
-
-          <div className="feature-image-wrap">
-           <img src={progressImage} alt="Progress" loading="lazy" />
-          </div>
-        </div>
+        ))}
       </section>
 
       {/* Profile Modal */}
