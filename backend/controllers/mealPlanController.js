@@ -162,53 +162,47 @@ OUTPUT FORMAT (STRICT):
 
 
 
-    const aiResponseRaw = await generateMealPlan(prompt);
+    // ===== RETRY AI LOGIC =====
+    const MAX_RETRIES = 3;
+    let aiResponseRaw, mealPlanData;
 
-    let mealPlanData;
-    try {
-      mealPlanData = JSON.parse(aiResponseRaw);
-      console.log(mealPlanData);
-    } catch (err) {
-      console.error("AI returned invalid JSON:", aiResponseRaw);
-      return res.status(500).json({
-        success: false,
-        message: "AI returned invalid JSON"
-      });
+    for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+      aiResponseRaw = await generateMealPlan(prompt);
+      try {
+        mealPlanData = JSON.parse(aiResponseRaw);
+        break; // valid JSON
+      } catch (err) {
+        console.warn(`Attempt ${attempt} failed to parse AI JSON:`, aiResponseRaw);
+        if (attempt === MAX_RETRIES) {
+          return res.status(500).json({
+            success: false,
+            message: "AI meal plan JSON invalid after multiple attempts",
+            rawAI: aiResponseRaw,
+          });
+        }
+      }
     }
 
-
-
-
+    // ===== REST OF YOUR ORIGINAL LOGIC =====
     const aiDuration = mealPlanData.durationDays && !isNaN(mealPlanData.durationDays)
       ? Number(mealPlanData.durationDays)
-      : 7; // fallback
-
-    let durationDays;
-    //If user selected 0 → AI decides
-    //If user selected less than 7 → AI decides
-    //If user selected 7 or more → use user value
-    if (requestedDays === 0) {
-      durationDays = aiDuration;
-    } else {
-      durationDays = requestedDays < 7 ? aiDuration : requestedDays;
-    }
+      : 7;
+    let durationDays = requestedDays === 0 ? aiDuration : requestedDays < 7 ? aiDuration : requestedDays;
 
     await UserProfile.findOneAndUpdate(
       { user_id },
       { days: durationDays },
       { new: true }
     );
-    // Ensure totalCalories is a number
+
     if (!mealPlanData.totalCalories || isNaN(mealPlanData.totalCalories)) {
       mealPlanData.totalCalories = macros.calories;
     }
 
     const startDateUTC = new Date();
-    startDateUTC.setUTCHours(0, 0, 0, 0);   // set time to 00:00:00 UTC
-
+    startDateUTC.setUTCHours(0, 0, 0, 0);
     const endDateUTC = new Date(startDateUTC);
     endDateUTC.setDate(endDateUTC.getDate() + durationDays - 1);
-
 
     const newMealPlan = await MealPlan.create({
       user_id,
@@ -222,14 +216,11 @@ OUTPUT FORMAT (STRICT):
       status: "active",
     });
 
-
-    // Save Meals and FoodItems
     for (const meal of mealPlanData.meals || []) {
       const newMeal = await Meal.create({
         mealplan_id: newMealPlan._id,
         mealType: meal.mealType,
       });
-
       for (const food of meal.foods || []) {
         await FoodItem.create({
           meal_id: newMeal._id,
@@ -242,11 +233,12 @@ OUTPUT FORMAT (STRICT):
         });
       }
     }
-    // AFTER SUCCESS -> mark old plan as updated
+
     await MealPlan.updateMany(
       { user_id, status: "active", _id: { $ne: newMealPlan._id } },
       { status: "account-updated" }
     );
+
     res.json({
       success: true,
       message: "Meal plan generated and saved successfully",
@@ -262,7 +254,6 @@ OUTPUT FORMAT (STRICT):
     });
   }
 };
-
 // Update MealPlan Status
 
 export const updateMealPlanStatus = async (req, res) => {

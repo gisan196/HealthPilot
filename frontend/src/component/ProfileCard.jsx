@@ -175,7 +175,7 @@ const ProfileCard = ({ onClose, edit = false }) => {
 
       markProfileUpdated();
 
-      /* ✅ SUCCESS ALERT */
+      /*  SUCCESS ALERT */
       setAlert({
         type: "success",
         message:

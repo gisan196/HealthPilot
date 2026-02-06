@@ -6,6 +6,15 @@
   min-height: calc(100vh - 64px - 64px);
   
 }
+.workouts-wrapper {
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
+  background: #e5efe9;
+  padding: 0; 
+  box-sizing: border-box;
+  
+}
 
 .workouts-inner {
   width: 100%;

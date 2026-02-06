@@ -71,11 +71,18 @@ export const createWorkoutPlan = async (req, res) => {
       ? Number(days)
       : 7;
     // AI prompt
-    const prompt = `
+const prompt = `
 You are a certified fitness coach.
 
 Create a WEEKLY WORKOUT PLAN in STRICT VALID JSON ONLY.
 The user will follow this plan for ${durationDays} days.
+
+⚠️ IMPORTANT: 
+- Only provide one single JSON object.
+- The field "difficulty" is for the entire plan, not per day.
+- All exercises must go into a single "exercises" array.
+- Use the "day" field in each exercise to indicate Monday, Tuesday, etc.
+- Even if ${durationDays} > 7, only provide exercises for each day of the week (Monday → Sunday). Repeat the week as needed.
 
 INCLUDE ONLY exercises that match this workout preference:
 ${workoutPreferences}
@@ -100,24 +107,22 @@ USER PROFILE (must be considered):
 - Health Conditions: ${healthText}
 
 STRICT RULES (VERY IMPORTANT):
-1. Strength / resistance exercises (e.g. gym, bodyweight, weights):
-   - reps MUST be a STRING range like "8-12", "10-15"
-2. Cardio exercises (e.g. running, walking, cycling, swimming):
-   - reps MUST be exactly "N/A" (as a STRING)
+1. Strength / resistance exercises:
+   - reps MUST be a STRING range like "8-12"
+2. Cardio exercises:
+   - reps MUST be "N/A" (string)
    - sets MUST be 1
 3. Reps MUST ALWAYS be a STRING
-   - Never a number
-   - Never empty
-4. DurationMinutes MUST be provided for ALL exercises
+4. DurationMinutes MUST be provided
 5. Sets MUST be a number
-6. Numbers must be plain digits ONLY (no units)
-7. Rest days are OPTIONAL
-   - If included as exercises, ALL numeric fields (sets, durationMinutes, caloriesBurned, restTime) MUST be 0
+6. Numbers must be plain digits ONLY
+7. Rest days:
+   - numeric fields MUST be 0
    - reps MUST be "N/A" (string)
 8. Safe for teens
 9. Avoid exercises that worsen health conditions
 10. NO explanations, NO comments, NO markdown
-11. NEVER output bare N/A values (must be "N/A" string or 0 for numbers)
+11. NEVER output bare N/A values
 
 OUTPUT FORMAT (STRICT):
 {
@@ -137,31 +142,42 @@ OUTPUT FORMAT (STRICT):
 }
 `;
 
-    // Call AI
-    const aiRaw = await generateWorkoutPlan(prompt);
 
-    let workoutData;
-    try {
-      workoutData = JSON.parse(aiRaw);
-      console.log(workoutData);
-    } catch (err) {
-      console.error("AI workout JSON invalid:", aiRaw);
-      return res.status(500).json({
-        success: false,
-        message: "AI workout JSON invalid"
-      });
+
+    // ===== RETRY AI LOGIC =====
+    const MAX_RETRIES = 3;
+    let aiRaw, workoutData;
+
+    for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+      aiRaw = await generateWorkoutPlan(prompt);
+
+      // ===== CLEAN PARTIAL JSON SAFELY =====
+      const lastBrace = aiRaw.lastIndexOf("}");
+      if (lastBrace > 0) {
+        aiRaw = aiRaw.slice(0, lastBrace + 1); // remove anything after the last }
+      }
+
+      try {
+        workoutData = JSON.parse(aiRaw);
+        break; // valid JSON, exit retry loop
+      } catch (err) {
+        console.warn(`Attempt ${attempt} failed to parse AI JSON:`, aiRaw);
+        if (attempt === MAX_RETRIES) {
+          return res.status(500).json({
+            success: false,
+            message: "AI workout JSON invalid after multiple attempts",
+            rawAI: aiRaw,
+          });
+        }
+      }
     }
 
-
     const startDateUTC = new Date();
-    startDateUTC.setUTCHours(0, 0, 0, 0);   // set time to 00:00:00 UTC
+    startDateUTC.setUTCHours(0, 0, 0, 0);
 
     const endDateUTC = new Date(startDateUTC);
     endDateUTC.setDate(endDateUTC.getDate() + durationDays - 1);
 
-
-
-    // Create WorkoutPlan document
     const workoutPlan = await WorkoutPlan.create({
       user_id,
       userProfile_id: userProfile._id,
@@ -170,10 +186,7 @@ OUTPUT FORMAT (STRICT):
       status: "active",
       startDate: startDateUTC,
       endDate: endDateUTC,
-
     });
-
-    // Save exercises per day
 
     let totalCalories = 0;
     let totalDuration = 0;
@@ -181,10 +194,7 @@ OUTPUT FORMAT (STRICT):
     for (const ex of workoutData.exercises || []) {
       const calories = ex.caloriesBurned || Math.round(weight * (ex.durationMinutes || 30) * 5);
       const duration = ex.durationMinutes || 30;
-      const reps =
-        typeof ex.reps === "string" && ex.reps.trim() !== ""
-          ? ex.reps
-          : "N/A";
+      const reps = typeof ex.reps === "string" && ex.reps.trim() !== "" ? ex.reps : "N/A";
 
       await Exercise.create({
         workoutplan_id: workoutPlan._id,
@@ -205,13 +215,14 @@ OUTPUT FORMAT (STRICT):
     workoutPlan.totalCaloriesBurned = totalCalories;
     workoutPlan.duration = totalDuration;
     await workoutPlan.save();
-    // AFTER SUCCESS -> mark old plan as updated
+
     await WorkoutPlan.updateMany(
       { user_id, status: "active", _id: { $ne: workoutPlan._id } },
       { status: "account-updated" }
     );
 
     res.json({ success: true, workoutPlan });
+
   } catch (err) {
     console.error("Workout Plan Error:", err);
     res.status(500).json({ success: false, message: "Workout plan generation failed", error: err.message });

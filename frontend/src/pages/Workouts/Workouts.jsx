@@ -229,6 +229,7 @@ export default function Workout() {
   <div className="workouts-page">
     {/* NO ACTIVE PLAN */}
     {!hasActivePlan && (
+      <div className="workouts-wrapper">
       <div className="workouts-inner">
         <div className="empty-state">
           <p>
@@ -241,8 +242,9 @@ export default function Workout() {
           >
             Generate Workout Plan
           </button>
+          </div>
+          </div>
         </div>
-      </div>
     )}
 
     {/* ACTIVE PLAN */}
