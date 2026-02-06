@@ -103,18 +103,21 @@ STRICT RULES (VERY IMPORTANT):
 1. Strength / resistance exercises (e.g. gym, bodyweight, weights):
    - reps MUST be a STRING range like "8-12", "10-15"
 2. Cardio exercises (e.g. running, walking, cycling, swimming):
-   - reps MUST be exactly "N/A"
+   - reps MUST be exactly "N/A" (as a STRING)
+   - sets MUST be 1
 3. Reps MUST ALWAYS be a STRING
    - Never a number
    - Never empty
 4. DurationMinutes MUST be provided for ALL exercises
 5. Sets MUST be a number
-   - For cardio exercises, sets = 1
 6. Numbers must be plain digits ONLY (no units)
-7. Rest days are OPTIONAL (do NOT add unless necessary)
+7. Rest days are OPTIONAL
+   - If included as exercises, ALL numeric fields (sets, durationMinutes, caloriesBurned, restTime) MUST be 0
+   - reps MUST be "N/A" (string)
 8. Safe for teens
 9. Avoid exercises that worsen health conditions
 10. NO explanations, NO comments, NO markdown
+11. NEVER output bare N/A values (must be "N/A" string or 0 for numbers)
 
 OUTPUT FORMAT (STRICT):
 {
@@ -133,7 +136,6 @@ OUTPUT FORMAT (STRICT):
   ]
 }
 `;
-
 
     // Call AI
     const aiRaw = await generateWorkoutPlan(prompt);

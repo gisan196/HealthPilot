@@ -22,7 +22,7 @@ export const generateWorkoutPlan = async (prompt) => {
           }
         ],
         temperature: 0.4,
-        max_tokens: 1300
+        max_tokens: 1800
       },
       {
         headers: {

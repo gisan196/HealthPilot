@@ -4,9 +4,6 @@ import ProfileCard from "../../component/ProfileCard.jsx";
 import { useAuth } from "../../context/authContext.jsx";
 import { getProfileByUserId } from "../../api/userProfileApi.js";
 import "./Home.css";
-//import workoutImage from "../../images/workout-image.jpg";
-//import mealPlanImage from "../../images/meal-plan.jpg";
-//import progressImage from "../../images/progress.jpg";
 import PageHeader from "../../component/PageHeader.jsx";
 import { FaHome } from "react-icons/fa";
 import { FaEdit, FaUserPlus } from "react-icons/fa";
@@ -22,7 +19,7 @@ const Home = () => {
   const [loading, setLoading] = useState(true);
   const [showProfileCard, setShowProfileCard] = useState(false);
   const token = localStorage.getItem("token");
-  const featureImages = [
+const featureImages = [
     {
       title: "🥗 Personalized Diet Plans",
       description:
@@ -47,7 +44,6 @@ const Home = () => {
       type: "progress-cards",
     },
   ];
-
   useEffect(() => {
     if (location.state?.alert) {
       setAlert(location.state.alert);
@@ -78,10 +74,8 @@ const Home = () => {
     };
 
     fetchProfile();
-  }, [user?.id, profileUpdated, token]);
-  if (loading) {
-    return <Loading text="Loading Home Page..." />;
-  }
+  }, [user?.id]);
+  if (loading) {return <Loading text="Loading Home Page..." />};
   return (
     <main className="home">
       {alert && (
@@ -125,7 +119,6 @@ const Home = () => {
       </section>
 
       {/* Features */}
-
       <section className="features">
         {featureImages.map((feature, index) => (
           <div

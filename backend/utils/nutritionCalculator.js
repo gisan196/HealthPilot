@@ -86,7 +86,7 @@ export function calculateMacros(user) {
     calories = Math.max(calories, teenSafe);
   }
 
-  // Don't clamp to 0 if you want negative numbers
+ 
   // calories = Math.max(calories, 0);
 
   let protein = calculateProtein(weight, fitnessGoal);
