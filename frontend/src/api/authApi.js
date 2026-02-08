@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const API = axios.create({
-  baseURL: "http://localhost:5000/api",
+  baseURL: "https://healthpilot-82jv.onrender.com",
 });
 
 // REGISTER (NO TOKEN)
@@ -19,3 +19,4 @@ export const forgotPassword = (email) =>
 
 export const resetPassword = (token, data) =>
   API.patch(`/auth/reset-password/${token}`, data);
+
