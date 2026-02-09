@@ -22,3 +22,4 @@ export const forgotPassword = (email) =>
 
 export const resetPassword = (token, data) =>
   API.patch(`/auth/reset-password/${token}`, data);
+
