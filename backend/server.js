@@ -18,7 +18,11 @@ dotenv.config();
 
 const app = express();
 const httpServer = createServer(app);
+import path from "path";
+import { fileURLToPath } from "url";
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 // Socket.IO setup
 export const io = new Server(httpServer, {
   cors: { origin: "*" }, // allow all origins or specify your frontend
@@ -53,20 +57,13 @@ app.use("/api/daily-progress", dailyProgressRoutes);
 app.use("/api/plan-feedback", planFeedbackRoutes);
 
 
-import path from "path";
-import { fileURLToPath } from "url";
+// Serve React static files
+app.use(express.static(path.join(__dirname, "frontend", "dist")));
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-// Serve React static files (after all API routes)
-app.use(express.static(path.join(__dirname, "frontend", "dist"))); // Vite build folder
-
-// Catch-all for React Router using regex
+// Catch-all for React Router
 app.get(/^\/(?!api).*/, (req, res) => {
   res.sendFile(path.join(__dirname, "frontend", "dist", "index.html"));
 });
-
 // Connect to MongoDB
 mongoose
   .connect(process.env.MONGO_URI)
