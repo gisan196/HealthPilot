@@ -7,10 +7,13 @@ const AuthContext = createContext();
 export const AuthProvider = ({ children }) => {
   const navigate = useNavigate();
 
-  const [user, setUser] = useState(() => {
-  const storedUser = localStorage.getItem("user");
-  return storedUser ? JSON.parse(storedUser) : null;
-});
+const tryParse = (str, fallback = null) => {
+  try { return JSON.parse(str); } 
+  catch { return fallback; }
+};
+
+const [user, setUser] = useState(() => tryParse(localStorage.getItem("user")));
+
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -28,31 +31,32 @@ export const AuthProvider = ({ children }) => {
   };
 
   // AUTO LOGOUT WHEN TOKEN EXPIRES
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (!token) return;
+ useEffect(() => {
+  const token = localStorage.getItem("token");
+  if (!token) return;
 
-    try {
-      const decoded = JSON.parse(atob(token.split(".")[1]));
-      const expiry = decoded.exp * 1000; // convert to ms
-      const now = Date.now();
-      const delay = expiry - now;
+  try {
+    const payload = token.split(".")[1];
+    if (!payload) throw new Error("Invalid token");
 
-      if (delay <= 0) {
-        logOut();
-        return;
-      }
+    const decoded = JSON.parse(atob(payload));
+    const expiry = decoded.exp * 1000;
+    const now = Date.now();
+    const delay = expiry - now;
 
-      const timer = setTimeout(() => {
-        logOut();
-      }, delay);
-
-      return () => clearTimeout(timer);
-    } catch (err) {
-      // if token is invalid, logout immediately
+    if (delay <= 0) {
       logOut();
+      return;
     }
-  }, [user]);
+
+    const timer = setTimeout(() => logOut(), delay);
+    return () => clearTimeout(timer);
+
+  } catch (err) {
+    logOut();
+  }
+}, [user]);
+
 
   // LOGIN
   const logIn = async (data) => {
