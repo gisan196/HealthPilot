@@ -52,22 +52,19 @@ app.use("/api/workout-plan", workoutPlanRoutes);
 app.use("/api/daily-progress", dailyProgressRoutes);
 app.use("/api/plan-feedback", planFeedbackRoutes);
 
-// server.js (after all API routes)
+
 import path from "path";
 import { fileURLToPath } from "url";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Serve React build files
+// Serve React static files (after all API routes)
 app.use(express.static(path.join(__dirname, "frontend", "dist"))); // Vite build folder
 
-// Catch-all for React Router
-app.get("*", (req, res) => {
-  // Only for non-API routes
-  if (!req.path.startsWith("/api")) {
-    res.sendFile(path.join(__dirname, "frontend", "dist", "index.html"));
-  }
+// Catch-all for React Router using regex
+app.get(/^\/(?!api).*/, (req, res) => {
+  res.sendFile(path.join(__dirname, "frontend", "dist", "index.html"));
 });
 
 // Connect to MongoDB
