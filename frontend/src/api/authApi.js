@@ -1,7 +1,10 @@
 import axios from "axios";
+import { API_BASE_URL } from "./api";
+
+const API_URL = `${API_BASE_URL}`;
 
 const API = axios.create({
-  baseURL: "http://localhost:5000/api",
+  baseURL: API_URL,
 });
 
 // REGISTER (NO TOKEN)

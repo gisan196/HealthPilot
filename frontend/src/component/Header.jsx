@@ -12,7 +12,7 @@ import {
 import { useAlert } from "../context/alertContext.jsx";
 const Header = ({ disableLinks }) => {
   const location = useLocation();
-   const { showAlert } = useAlert();
+  const { showAlert } = useAlert();
   const [open, setOpen] = useState(false);
   const [notifOpen, setNotifOpen] = useState(false);
   const [notifications, setNotifications] = useState([]);
@@ -34,7 +34,10 @@ const Header = ({ disableLinks }) => {
   useEffect(() => {
     if (!user?.id) return;
 
-    const socket = io("http://localhost:5000");
+    //const socket = io("http://localhost:5000");
+    const socket = io("https://healthpilot-82jv.onrender.com", {
+      transports: ["websocket"],
+    });
     socketRef.current = socket;
 
     socket.on("connect", () => {
@@ -79,16 +82,16 @@ const Header = ({ disableLinks }) => {
   };
 
   const handleLogout = () => {
-  logOut();
-  showAlert({
-    type: "success",
-    message: "Logged out successfully.",
-    autoClose: true,
-    duration: 4000,
-  });
-  navigate("/");
-  setOpen(false);
-};
+    logOut();
+    showAlert({
+      type: "success",
+      message: "Logged out successfully.",
+      autoClose: true,
+      duration: 4000,
+    });
+    navigate("/");
+    setOpen(false);
+  };
 
   useEffect(() => {
     const handleClickOutside = (e) => {
@@ -189,7 +192,7 @@ const Header = ({ disableLinks }) => {
                       {notifications.map((n) => {
                         const time = new Date(n.createdAt).toLocaleTimeString(
                           [],
-                          { hour: "2-digit", minute: "2-digit", hour12: true }
+                          { hour: "2-digit", minute: "2-digit", hour12: true },
                         );
                         return (
                           <div
@@ -209,14 +212,13 @@ const Header = ({ disableLinks }) => {
               )}
             </div>
 
-           <div
-  className={`icon-item ${location.pathname === "/profile" ? "active" : ""}`}
-  data-label="Profile"
-  onClick={() => (disableLinks ? null : navigate("/profile"))}
->
-  <FiUser />
-</div>
-
+            <div
+              className={`icon-item ${location.pathname === "/profile" ? "active" : ""}`}
+              data-label="Profile"
+              onClick={() => (disableLinks ? null : navigate("/profile"))}
+            >
+              <FiUser />
+            </div>
 
             <div
               className="icon-item"

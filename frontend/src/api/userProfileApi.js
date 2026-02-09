@@ -1,7 +1,8 @@
 import axios from "axios";
+import { API_BASE_URL } from "./api";
 
-// Base URL
-const API_URL = "http://localhost:5000/api/user-profiles";
+const API_URL = `${API_BASE_URL}/user-profiles`;
+
 
 // Get token from localStorage
 const getAuthHeader = () => {
