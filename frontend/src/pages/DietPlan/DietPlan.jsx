@@ -48,10 +48,13 @@ export default function DietPlan() {
         setProfileExists(false);
         setLoading(false);
 
-        // Auto redirect after 3 seconds
+        // Auto redirect after 2 seconds
         setTimeout(() => {
-          navigate("/home");
-        }, 3000);
+          if (user) {
+            // <- check user is logged in
+            navigate("/home", { replace: true });
+          }
+        }, 2000);
 
         return;
       }
@@ -65,8 +68,11 @@ export default function DietPlan() {
       setProfileExists(false);
       setLoading(false);
       setTimeout(() => {
-        navigate("/home");
-      }, 3000);
+        if (user) {
+          // <- check user is logged in
+          navigate("/home", { replace: true });
+        }
+      }, 2000);
     }
   };
 

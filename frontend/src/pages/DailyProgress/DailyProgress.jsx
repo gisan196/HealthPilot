@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef } from "react";
 import "./DailyProgress.css";
 import { useAuth } from "../../context/authContext.jsx";
+import { useNavigate } from "react-router-dom";
 import {
   getLatestWorkoutPlan,
   getExercisesByDate,
@@ -39,6 +40,7 @@ import ConfirmModal from "../../component/ConfirmModal.jsx";
 
 export default function DailyProgress() {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const { showAlert } = useAlert();
   const [profileExists, setProfileExists] = useState(true);
   const [mealPlanExists, setMealPlanExists] = useState(false);
@@ -156,7 +158,10 @@ export default function DailyProgress() {
       if (!profileRes) {
         setProfileExists(false);
         setTimeout(() => {
-          window.location.href = "/home";
+          if (user) {
+            // <- check user is logged in
+            navigate("/home", { replace: true });
+          }
         }, 2000);
         return;
       }

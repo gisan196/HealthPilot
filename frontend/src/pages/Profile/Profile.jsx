@@ -49,7 +49,10 @@ const Profile = () => {
       if (!data) {
         setProfile(null);
         setTimeout(() => {
-          navigate("/home", { replace: true });
+          if (user) {
+            // <- check user is logged in
+            navigate("/home", { replace: true });
+          }
         }, 2000);
         return;
       }
@@ -84,7 +87,10 @@ const Profile = () => {
       setTimeout(() => {
         setShowConfirm(false);
         setProfile(null);
-        navigate("/home");
+        if (user) {
+          // <- check user is logged in
+          navigate("/home", { replace: true });
+        }
       }, 1500);
     } catch (err) {
       console.error("Profile delete failed", err);
