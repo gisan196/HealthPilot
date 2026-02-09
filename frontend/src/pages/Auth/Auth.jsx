@@ -20,7 +20,6 @@ const Auth = () => {
   const initialState = {
     username: "",
     email: "",
-    role: "user",
     password: "",
     confirmpassword: "",
   };
@@ -194,15 +193,7 @@ const Auth = () => {
                 onChange={handleChange}
                 required
               />
-              <select
-                name="role"
-                value={data.role}
-                onChange={handleChange}
-                required
-              >
-                <option value="user">User</option>
-                <option value="admin">Admin</option>
-              </select>
+              
             </>
           )}
 

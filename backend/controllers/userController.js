@@ -3,7 +3,7 @@ import User  from "../models/User.js";
 // CREATE USER
 export const createUser = async (req, res) => {
   try {
-    const { username, email, password, role } = req.body;
+    const { username, email, password } = req.body;
 
     if (!username || !email || !password) {
       return res.status(400).json({
@@ -28,7 +28,7 @@ export const createUser = async (req, res) => {
       username,
       email,
       password,
-      role
+      role: "user",
     });
 
     await user.save();
