@@ -1,1 +1,1 @@
-export const API_BASE_URL = "https://healthpilot-82jv.onrender.com/api";
+export const API_BASE_URL = import.meta.env.API_BASE_URL;
