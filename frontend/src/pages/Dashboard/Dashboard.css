@@ -16,9 +16,9 @@
 
 .dashboard-grid {
   display: grid;
-  grid-template-columns: 220px 1fr 1fr;
+  grid-template-columns: minmax(260px, 320px) 1fr 1fr;
   gap: 16px;
-  column-gap: 44px;
+  column-gap: 48px;
   grid-template-areas:
     "progress stats calendar"
     "progress adherence calories";
@@ -30,6 +30,10 @@
   height: 100%;
 }
 
+.progress-col {
+  margin-right: 24px;
+}
+
 .progress-col,
 .stats-col,
 .calendar-col,
@@ -38,6 +42,7 @@
   height: 100%;
   display: flex;
   flex-direction: column;
+  padding: 8px;
 }
 
 .progress-col > * ,
