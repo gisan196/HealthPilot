@@ -3,7 +3,7 @@ import express from "express";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
 import cors from "cors";
-import path from "path";
+
 import userRoutes from "./routes/userRoutes.js";
 import userProfileRoutes from "./routes/userProfileRoutes.js";
 import authRoutes from "./routes/authRoutes.js";
@@ -51,16 +51,6 @@ app.use("/api/notifications", notificationRoutes);
 app.use("/api/workout-plan", workoutPlanRoutes);
 app.use("/api/daily-progress", dailyProgressRoutes);
 app.use("/api/plan-feedback", planFeedbackRoutes);
-
-
-
-const __dirname = path.resolve();
-app.use(express.static(path.join(__dirname, "frontend/build")));
-
-// Only serve index.html for non-API routes
-app.get(/^(?!\/api).*/, (req, res) => {
-  res.sendFile(path.join(__dirname, "frontend/build", "index.html"));
-});
 // Connect to MongoDB
 mongoose
   .connect(process.env.MONGO_URI)
