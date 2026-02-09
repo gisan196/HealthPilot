@@ -11,135 +11,130 @@ import ResetPassword from "./pages/ResetPassword/ResetPassword.jsx";
 import { useAuth } from "./context/authContext.jsx";
 import PageLayout from "./layouts/PageLayout.jsx";
 import ScrollToTop from "./component/ScrollToTop.jsx";
-
 function App() {
-  const { user, loading } = useAuth();
-
-  // Show loading screen while user state is initializing
-  if (loading) {
-    return (
-      <div className="app-loading">
-        <p>Loading...</p>
-      </div>
-    );
-  }
+  const { user } = useAuth();
 
   return (
     <>
-      <ScrollToTop />
-      <Routes>
-        {/* PUBLIC AUTH PAGES */}
-        <Route
-          path="/"
-          element={
-            user ? (
-              <Navigate to="/home" replace />
-            ) : (
-              <PageLayout hideNavLinks>
-                <Auth />
-              </PageLayout>
-            )
-          }
-        />
-        <Route
-          path="/forgot-password"
-          element={
-            user ? (
-              <Navigate to="/home" replace />
-            ) : (
-              <PageLayout hideNavLinks>
-                <ForgotPassword />
-              </PageLayout>
-            )
-          }
-        />
-        <Route
-          path="/reset-password/:token"
-          element={
-            user ? (
-              <Navigate to="/home" replace />
-            ) : (
-              <PageLayout hideNavLinks>
-                <ResetPassword />
-              </PageLayout>
-            )
-          }
-        />
+   <ScrollToTop />
+    <Routes>
+      {/* AUTH */}
+      <Route
+        path="/"
+        element={
+          user ? (
+            <Navigate to="/home" replace />
+          ) : (
+            <PageLayout hideNavLinks>
+              <Auth />
+            </PageLayout>
+          )
+        }
+      />
 
-        {/* PROTECTED PAGES */}
-        <Route
-          path="/home"
-          element={
-            user ? (
-              <PageLayout>
-                <Home />
-              </PageLayout>
-            ) : (
-              <Navigate to="/" replace />
-            )
-          }
-        />
-        <Route
-          path="/profile"
-          element={
-            user ? (
-              <PageLayout>
-                <Profile />
-              </PageLayout>
-            ) : (
-              <Navigate to="/" replace />
-            )
-          }
-        />
-        <Route
-          path="/dashboard"
-          element={
-            user ? (
-              <PageLayout>
-                <Dashboard />
-              </PageLayout>
-            ) : (
-              <Navigate to="/" replace />
-            )
-          }
-        />
-        <Route
-          path="/dietplan"
-          element={
-            user ? (
-              <PageLayout>
-                <DietPlan />
-              </PageLayout>
-            ) : (
-              <Navigate to="/" replace />
-            )
-          }
-        />
-        <Route
-          path="/workouts"
-          element={
-            user ? (
-              <PageLayout>
-                <Workouts />
-              </PageLayout>
-            ) : (
-              <Navigate to="/" replace />
-            )
-          }
-        />
-        <Route
-          path="/dailyprogress"
-          element={
-            user ? (
-              <PageLayout>
-                <DailyProgress />
-              </PageLayout>
-            ) : (
-              <Navigate to="/" replace />
-            )
-          }
-        />
-      </Routes>
+      <Route
+        path="/forgot-password"
+        element={
+          user ? (
+            <Navigate to="/home" replace />
+          ) : (
+            <PageLayout hideNavLinks>
+              <ForgotPassword />
+            </PageLayout>
+          )
+        }
+      />
+      <Route
+        path="/reset-password/:token"
+        element={
+          user ? (
+            <Navigate to="/home" replace />
+          ) : (
+            <PageLayout hideNavLinks>
+              <ResetPassword />
+            </PageLayout>
+          )
+        }
+      />
+
+      {/* PROTECTED PAGES */}
+      <Route
+        path="/home"
+        element={
+          user ? (
+            <PageLayout>
+              <Home />
+            </PageLayout>
+          ) : (
+            <Navigate to="/" replace />
+          )
+        }
+      />
+
+      <Route
+        path="/profile"
+        element={
+          user ? (
+            <PageLayout>
+              <Profile />
+            </PageLayout>
+          ) : (
+            <Navigate to="/" replace />
+          )
+        }
+      />
+
+      {/* ADD OTHERS */}
+      <Route
+        path="/dashboard"
+        element={
+          user ? (
+            <PageLayout>
+              <Dashboard />
+            </PageLayout>
+          ) : (
+            <Navigate to="/" replace />
+          )
+        }
+      />
+      <Route
+        path="/dietplan"
+        element={
+          user ? (
+            <PageLayout>
+              <DietPlan />
+            </PageLayout>
+          ) : (
+            <Navigate to="/" replace />
+          )
+        }
+      />
+      <Route
+        path="/workouts"
+        element={
+          user ? (
+            <PageLayout>
+              <Workouts />
+            </PageLayout>
+          ) : (
+            <Navigate to="/" replace />
+          )
+        }
+      />
+      <Route
+        path="/dailyprogress"
+        element={
+          user ? (
+            <PageLayout>
+              <DailyProgress />
+            </PageLayout>
+          ) : (
+            <Navigate to="/" replace />
+          )
+        }
+      />
+      
+    </Routes>
     </>
   );
 }
