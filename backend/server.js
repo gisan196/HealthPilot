@@ -57,10 +57,10 @@ app.use("/api/plan-feedback", planFeedbackRoutes);
 const __dirname = path.resolve();
 app.use(express.static(path.join(__dirname, "frontend/build")));
 
-app.get("*", (req, res) => {
+// Only serve index.html for non-API routes
+app.get(/^(?!\/api).*/, (req, res) => {
   res.sendFile(path.join(__dirname, "frontend/build", "index.html"));
 });
-
 // Connect to MongoDB
 mongoose
   .connect(process.env.MONGO_URI)
