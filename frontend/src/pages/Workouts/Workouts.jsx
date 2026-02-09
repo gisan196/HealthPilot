@@ -170,7 +170,7 @@ export default function Workout() {
     }
   };
 
-  if (loading) return <Loading text="Loading dashboard..." />;
+  if (loading) return <Loading text="Loading workout plan..." />;
 
   if (!profileExists) {
     return (
