@@ -28,7 +28,7 @@ export const generateWorkoutPlan = async (prompt) => {
         headers: {
           Authorization: `Bearer ${process.env.OPENROUTER_API_KEY}`,
           "Content-Type": "application/json",
-          "HTTP-Referer": process.env.OPENROUTER_REFERER,
+          "HTTP-Referer": process.env.FRONTEND_URL,
           "X-Title": "AI Workout Planner"
         }
       }

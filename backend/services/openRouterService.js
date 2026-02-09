@@ -22,7 +22,7 @@ export const generateMealPlan = async (prompt) => {
       },
       {
         headers: {
-          Authorization: `Bearer ${process.env.OPENROUTER_API_KEY}`,
+          Authorization: `Bearer ${process.env.FRONTEND_URL}`,
           "Content-Type": "application/json",
           "HTTP-Referer": process.env.OPENROUTER_REFERER,
           "X-Title": "AI Meal Planner"
